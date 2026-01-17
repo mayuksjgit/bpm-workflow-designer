@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  bpm-tool:
+    build: .
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./workflows:/app/workflows
+      - ./saved_workflows:/app/saved_workflows
+    environment:
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+    restart: unless-stopped
+    container_name: bpm-workflow-designer

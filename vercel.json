@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "enhanced_bpm_tool.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "enhanced_bpm_tool.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": "."
+  }
+}

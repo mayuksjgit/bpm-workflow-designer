@@ -1,0 +1,99 @@
+{
+  "contexts": {
+    "ctx-001": {
+      "id": "ctx-001",
+      "name": "User Registration",
+      "x": 50,
+      "y": 50,
+      "width": 350,
+      "height": 250,
+      "color": "#e6f3ff",
+      "tasks": ["task-001", "task-002", "task-003"]
+    },
+    "ctx-002": {
+      "id": "ctx-002", 
+      "name": "Email Verification",
+      "x": 450,
+      "y": 50,
+      "width": 350,
+      "height": 250,
+      "color": "#fff2e6",
+      "tasks": ["task-004", "task-005"]
+    },
+    "ctx-003": {
+      "id": "ctx-003",
+      "name": "Account Activation",
+      "x": 850,
+      "y": 50,
+      "width": 350,
+      "height": 250,
+      "color": "#f0fff0",
+      "tasks": ["task-006"]
+    }
+  },
+  "tasks": {
+    "task-001": {
+      "id": "task-001",
+      "name": "Collect User Data",
+      "x": 70,
+      "y": 100,
+      "status": "success",
+      "color": "#ffffff",
+      "context_id": "ctx-001",
+      "successors": ["task-002"]
+    },
+    "task-002": {
+      "id": "task-002",
+      "name": "Validate Input",
+      "x": 180,
+      "y": 100,
+      "status": "success", 
+      "color": "#ffffff",
+      "context_id": "ctx-001",
+      "successors": ["task-003"]
+    },
+    "task-003": {
+      "id": "task-003",
+      "name": "Create Account",
+      "x": 290,
+      "y": 100,
+      "status": "delayed",
+      "color": "#ffffff",
+      "context_id": "ctx-001",
+      "successors": ["task-004"]
+    },
+    "task-004": {
+      "id": "task-004",
+      "name": "Send Email",
+      "x": 470,
+      "y": 100,
+      "status": "default",
+      "color": "#ffffff",
+      "context_id": "ctx-002",
+      "successors": ["task-005"]
+    },
+    "task-005": {
+      "id": "task-005",
+      "name": "Verify Token",
+      "x": 580,
+      "y": 100,
+      "status": "default",
+      "color": "#ffffff",
+      "context_id": "ctx-002",
+      "successors": ["task-006"]
+    },
+    "task-006": {
+      "id": "task-006",
+      "name": "Activate Account",
+      "x": 870,
+      "y": 100,
+      "status": "default",
+      "color": "#ffffff",
+      "context_id": "ctx-003",
+      "successors": []
+    }
+  },
+  "zoom_level": 1.0,
+  "canvas_width": 1400,
+  "canvas_height": 900
+}
