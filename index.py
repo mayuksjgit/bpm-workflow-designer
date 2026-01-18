@@ -15,7 +15,7 @@ class handler(BaseHTTPRequestHandler):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPM Workflow Designer - Drag & Drop</title>
+    <title>BPM Workflow Designer - Organized Layout</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -98,6 +98,12 @@ class handler(BaseHTTPRequestHandler):
         .danger-btn:hover {
             background: #d32f2f;
         }
+        .auto-arrange-btn {
+            background: #9C27B0;
+        }
+        .auto-arrange-btn:hover {
+            background: #7B1FA2;
+        }
         #canvas {
             width: 100%;
             height: 600px;
@@ -110,82 +116,132 @@ class handler(BaseHTTPRequestHandler):
         }
         .context-box {
             position: absolute;
-            border: 2px solid #333;
-            border-radius: 8px;
+            border: 3px solid #333;
+            border-radius: 12px;
             background: rgba(230, 243, 255, 0.9);
-            padding: 10px;
+            padding: 15px;
             cursor: move;
-            min-width: 220px;
-            min-height: 160px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
             z-index: 10;
         }
         .context-box:hover {
-            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+            transform: translateY(-2px);
         }
         .context-box.dragging {
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            transform: rotate(2deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+            transform: rotate(1deg) scale(1.02);
             z-index: 1000;
         }
         .context-header {
             font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .context-label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            width: 100px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.1);
+            border: 2px solid #666;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             font-size: 14px;
             color: #333;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
         }
-        .context-stats {
-            font-size: 10px;
-            color: #666;
-            margin-top: 5px;
+        .task-area {
+            margin-left: 130px;
+            padding: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
         .task-item {
-            position: absolute;
             background: white;
             border: 2px solid #333;
-            border-radius: 5px;
-            padding: 8px;
+            border-radius: 8px;
+            padding: 12px 16px;
             cursor: move;
-            font-size: 11px;
-            min-width: 80px;
+            font-size: 12px;
+            font-weight: bold;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             transition: all 0.2s;
             z-index: 20;
+            min-width: 80px;
+            position: relative;
         }
         .task-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transform: scale(1.05);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.25);
+            transform: translateY(-2px) scale(1.05);
         }
         .task-item.dragging {
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.35);
+            transform: scale(1.1) rotate(2deg);
             z-index: 1001;
         }
-        .task-success { background: #28a745; color: white; border-color: #1e7e34; }
-        .task-failure { background: #dc3545; color: white; border-color: #c82333; }
-        .task-delayed { background: #fd7e14; color: white; border-color: #e55a00; }
-        .task-skipped { background: #6c757d; color: white; border-color: #545b62; }
-        .task-default { background: #ffffff; color: #333; border-color: #333; }
+        .task-success { 
+            background: linear-gradient(135deg, #28a745, #20c997); 
+            color: white; 
+            border-color: #1e7e34; 
+        }
+        .task-failure { 
+            background: linear-gradient(135deg, #dc3545, #e74c3c); 
+            color: white; 
+            border-color: #c82333; 
+        }
+        .task-delayed { 
+            background: linear-gradient(135deg, #fd7e14, #ff9500); 
+            color: white; 
+            border-color: #e55a00; 
+        }
+        .task-skipped { 
+            background: linear-gradient(135deg, #6c757d, #868e96); 
+            color: white; 
+            border-color: #545b62; 
+        }
+        .task-default { 
+            background: linear-gradient(135deg, #ffffff, #f8f9fa); 
+            color: #333; 
+            border-color: #333; 
+        }
         .connection-line {
             position: absolute;
-            height: 3px;
-            background: linear-gradient(90deg, #666, #999);
-            transform-origin: left center;
-            z-index: 5;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
             border-radius: 2px;
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .connection-arrow {
             position: absolute;
             width: 0;
             height: 0;
-            border-left: 8px solid #666;
-            border-top: 4px solid transparent;
-            border-bottom: 4px solid transparent;
+            border-left: 12px solid #4CAF50;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
             z-index: 6;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        .inter-context-connection {
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+        }
+        .inter-context-arrow {
+            border-left-color: #2196F3;
         }
         .stats {
             background: rgba(255, 255, 255, 0.1);
@@ -199,66 +255,20 @@ class handler(BaseHTTPRequestHandler):
             border-radius: 5px;
             margin-bottom: 15px;
         }
-        .grid-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            pointer-events: none;
-            background-image: 
-                linear-gradient(to right, #333 1px, transparent 1px),
-                linear-gradient(to bottom, #333 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        .snap-indicator {
-            position: absolute;
-            border: 2px dashed #4CAF50;
-            background: rgba(76, 175, 80, 0.1);
-            pointer-events: none;
-            z-index: 999;
-            display: none;
-        }
-        .collision-warning {
-            position: absolute;
-            background: #ff5722;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 10px;
-            z-index: 1002;
-            display: none;
-        }
-        .auto-arrange-btn {
-            background: #9C27B0;
-        }
-        .auto-arrange-btn:hover {
-            background: #7B1FA2;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🔄 BPM Workflow Designer</h1>
-            <p>Drag & Drop Business Process Management Tool</p>
+            <p>Organized Layout - Contexts Stacked Vertically, Tasks Flow Horizontally</p>
             <div style="background: rgba(76, 175, 80, 0.2); padding: 8px; border-radius: 5px; margin: 10px 0; font-size: 14px;">
-                ✅ <strong>Enhanced with Drag & Drop!</strong> - Move contexts and tasks freely
+                ✅ <strong>Enhanced Layout!</strong> - Contexts arranged vertically, tasks flow horizontally within each context
             </div>
         </div>
 
         <div class="controls">
             <div class="control-panel">
-                <div class="grid-toggle">
-                    <label>
-                        <input type="checkbox" id="showGrid" checked> Show Grid
-                    </label>
-                    <label>
-                        <input type="checkbox" id="snapToGrid" checked> Snap to Grid
-                    </label>
-                </div>
-
                 <h3>📦 Context Management</h3>
                 <div class="input-group">
                     <label>Context Name:</label>
@@ -322,12 +332,8 @@ class handler(BaseHTTPRequestHandler):
             </div>
 
             <div class="canvas-area">
-                <h3 style="color: #333; margin: 0 0 10px 0;">🎨 Workflow Canvas - Drag & Drop Enabled</h3>
-                <div id="canvas">
-                    <div class="grid-overlay" id="gridOverlay"></div>
-                    <div class="snap-indicator" id="snapIndicator"></div>
-                    <div class="collision-warning" id="collisionWarning">⚠️ Overlap detected!</div>
-                </div>
+                <h3 style="color: #333; margin: 0 0 10px 0;">🎨 Workflow Canvas - Organized Layout</h3>
+                <div id="canvas"></div>
             </div>
         </div>
     </div>
@@ -339,82 +345,9 @@ class handler(BaseHTTPRequestHandler):
         let nextId = 1;
         let draggedElement = null;
         let dragOffset = { x: 0, y: 0 };
-        let gridSize = 20;
-        let showGrid = true;
-        let snapToGrid = true;
 
         function generateId() {
             return 'item_' + (nextId++);
-        }
-
-        function snapToGridPosition(x, y) {
-            if (!snapToGrid) return { x, y };
-            return {
-                x: Math.round(x / gridSize) * gridSize,
-                y: Math.round(y / gridSize) * gridSize
-            };
-        }
-
-        function checkCollision(element, x, y, width, height) {
-            const elementRect = { x, y, width, height };
-            
-            // Check collision with contexts
-            for (let context of contexts) {
-                if (context.id === element.id) continue;
-                const contextRect = {
-                    x: context.x,
-                    y: context.y,
-                    width: context.width,
-                    height: context.height
-                };
-                if (rectsOverlap(elementRect, contextRect)) {
-                    return true;
-                }
-            }
-            
-            // Check collision with tasks
-            for (let task of tasks) {
-                if (task.id === element.id) continue;
-                const taskRect = {
-                    x: task.x,
-                    y: task.y,
-                    width: 90,
-                    height: 35
-                };
-                if (rectsOverlap(elementRect, taskRect)) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-
-        function rectsOverlap(rect1, rect2) {
-            return !(rect1.x + rect1.width <= rect2.x || 
-                    rect2.x + rect2.width <= rect1.x || 
-                    rect1.y + rect1.height <= rect2.y || 
-                    rect2.y + rect2.height <= rect1.y);
-        }
-
-        function findNonOverlappingPosition(element, preferredX, preferredY, width, height) {
-            let x = preferredX;
-            let y = preferredY;
-            let attempts = 0;
-            const maxAttempts = 100;
-            
-            while (checkCollision(element, x, y, width, height) && attempts < maxAttempts) {
-                x += gridSize;
-                if (x + width > 1000) {
-                    x = 0;
-                    y += gridSize;
-                }
-                if (y + height > 580) {
-                    y = 0;
-                }
-                attempts++;
-            }
-            
-            return snapToGridPosition(x, y);
         }
 
         function addContext() {
@@ -426,24 +359,16 @@ class handler(BaseHTTPRequestHandler):
                 return;
             }
 
-            const width = 220;
-            const height = 160;
-            const preferredX = Math.random() * 300 + 50;
-            const preferredY = Math.random() * 200 + 50;
-            
+            const contextIndex = contexts.length;
             const context = {
                 id: generateId(),
                 name: name.trim(),
                 color: color,
-                width: width,
-                height: height,
-                x: 0,
-                y: 0
+                width: 800,
+                height: 120,
+                x: 50,
+                y: 50 + (contextIndex * 150) // Stack contexts vertically
             };
-
-            const position = findNonOverlappingPosition(context, preferredX, preferredY, width, height);
-            context.x = position.x;
-            context.y = position.y;
 
             contexts.push(context);
             renderCanvas();
@@ -471,23 +396,18 @@ class handler(BaseHTTPRequestHandler):
             const context = contexts.find(c => c.id === contextId);
             if (!context) return;
 
-            const width = 90;
-            const height = 35;
-            const preferredX = context.x + 20;
-            const preferredY = context.y + 40;
+            // Position task horizontally within context
+            const contextTasks = tasks.filter(t => t.contextId === contextId);
+            const taskIndex = contextTasks.length;
 
             const task = {
                 id: generateId(),
                 name: name.trim(),
                 status: status,
                 contextId: contextId,
-                x: 0,
-                y: 0
+                x: context.x + 180 + (taskIndex * 140), // Horizontal flow
+                y: context.y + 40 // Center vertically in context
             };
-
-            const position = findNonOverlappingPosition(task, preferredX, preferredY, width, height);
-            task.x = position.x;
-            task.y = position.y;
 
             tasks.push(task);
             renderCanvas();
@@ -533,42 +453,19 @@ class handler(BaseHTTPRequestHandler):
         }
 
         function autoArrange() {
-            const canvasWidth = 1000;
-            const canvasHeight = 580;
-            const contextSpacing = 250;
-            const taskSpacing = 100;
-            
-            // Arrange contexts in a grid
-            let contextX = 50;
-            let contextY = 50;
-            let contextsPerRow = Math.floor(canvasWidth / contextSpacing);
-            
+            // Arrange contexts vertically
             contexts.forEach((context, index) => {
-                context.x = contextX;
-                context.y = contextY;
+                context.x = 50;
+                context.y = 50 + (index * 150);
+                context.width = 800;
+                context.height = 120;
                 
-                // Arrange tasks within this context
+                // Arrange tasks horizontally within context
                 const contextTasks = tasks.filter(t => t.contextId === context.id);
-                let taskX = context.x + 20;
-                let taskY = context.y + 40;
-                let tasksPerRow = 2;
-                
                 contextTasks.forEach((task, taskIndex) => {
-                    task.x = taskX;
-                    task.y = taskY;
-                    
-                    taskX += taskSpacing;
-                    if ((taskIndex + 1) % tasksPerRow === 0) {
-                        taskX = context.x + 20;
-                        taskY += 45;
-                    }
+                    task.x = context.x + 180 + (taskIndex * 140);
+                    task.y = context.y + 40;
                 });
-                
-                contextX += contextSpacing;
-                if ((index + 1) % contextsPerRow === 0) {
-                    contextX = 50;
-                    contextY += 200;
-                }
             });
             
             renderCanvas();
@@ -576,9 +473,7 @@ class handler(BaseHTTPRequestHandler):
 
         function renderCanvas() {
             const canvas = document.getElementById('canvas');
-            // Clear only dynamic content, keep grid and indicators
-            const dynamicElements = canvas.querySelectorAll('.context-box, .task-item, .connection-line, .connection-arrow');
-            dynamicElements.forEach(el => el.remove());
+            canvas.innerHTML = '';
 
             // Render connections first (behind other elements)
             connections.forEach(connection => {
@@ -586,31 +481,73 @@ class handler(BaseHTTPRequestHandler):
                 const targetTask = tasks.find(t => t.id === connection.targetId);
                 
                 if (sourceTask && targetTask) {
-                    const startX = sourceTask.x + 45;
-                    const startY = sourceTask.y + 17;
+                    const sourceContext = contexts.find(c => c.id === sourceTask.contextId);
+                    const targetContext = contexts.find(c => c.id === targetTask.contextId);
+                    const isInterContext = sourceContext.id !== targetContext.id;
+                    
+                    const startX = sourceTask.x + 50; // Center of source task
+                    const startY = sourceTask.y + 20;
                     const endX = targetTask.x;
-                    const endY = targetTask.y + 17;
+                    const endY = targetTask.y + 20;
                     
-                    const dx = endX - startX;
-                    const dy = endY - startY;
-                    const length = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                    
-                    // Connection line
+                    // Create connection line
                     const line = document.createElement('div');
-                    line.className = 'connection-line';
-                    line.style.left = startX + 'px';
-                    line.style.top = (startY - 1) + 'px';
-                    line.style.width = length + 'px';
-                    line.style.transform = `rotate(${angle}deg)`;
-                    canvas.appendChild(line);
+                    line.className = isInterContext ? 'connection-line inter-context-connection' : 'connection-line';
                     
-                    // Arrow head
-                    const arrow = document.createElement('div');
-                    arrow.className = 'connection-arrow';
-                    arrow.style.left = (endX - 8) + 'px';
-                    arrow.style.top = (endY - 4) + 'px';
-                    canvas.appendChild(arrow);
+                    if (isInterContext) {
+                        // Vertical then horizontal connection for inter-context
+                        const midY = sourceContext.y + sourceContext.height + 20;
+                        
+                        // Vertical line down from source
+                        const verticalLine = document.createElement('div');
+                        verticalLine.className = 'connection-line inter-context-connection';
+                        verticalLine.style.left = startX + 'px';
+                        verticalLine.style.top = startY + 'px';
+                        verticalLine.style.width = '4px';
+                        verticalLine.style.height = (midY - startY) + 'px';
+                        canvas.appendChild(verticalLine);
+                        
+                        // Horizontal line across
+                        const horizontalLine = document.createElement('div');
+                        horizontalLine.className = 'connection-line inter-context-connection';
+                        horizontalLine.style.left = Math.min(startX, endX) + 'px';
+                        horizontalLine.style.top = midY + 'px';
+                        horizontalLine.style.width = Math.abs(endX - startX) + 'px';
+                        horizontalLine.style.height = '4px';
+                        canvas.appendChild(horizontalLine);
+                        
+                        // Vertical line up to target
+                        const verticalLine2 = document.createElement('div');
+                        verticalLine2.className = 'connection-line inter-context-connection';
+                        verticalLine2.style.left = endX + 'px';
+                        verticalLine2.style.top = midY + 'px';
+                        verticalLine2.style.width = '4px';
+                        verticalLine2.style.height = (endY - midY) + 'px';
+                        canvas.appendChild(verticalLine2);
+                        
+                        // Arrow at target
+                        const arrow = document.createElement('div');
+                        arrow.className = 'connection-arrow inter-context-arrow';
+                        arrow.style.left = (endX - 12) + 'px';
+                        arrow.style.top = (endY - 6) + 'px';
+                        canvas.appendChild(arrow);
+                    } else {
+                        // Direct horizontal connection within context
+                        const dx = endX - startX;
+                        const length = Math.abs(dx);
+                        
+                        line.style.left = startX + 'px';
+                        line.style.top = (startY - 2) + 'px';
+                        line.style.width = length + 'px';
+                        canvas.appendChild(line);
+                        
+                        // Arrow head
+                        const arrow = document.createElement('div');
+                        arrow.className = 'connection-arrow';
+                        arrow.style.left = (endX - 12) + 'px';
+                        arrow.style.top = (endY - 6) + 'px';
+                        canvas.appendChild(arrow);
+                    }
                 }
             });
 
@@ -628,8 +565,10 @@ class handler(BaseHTTPRequestHandler):
                 
                 const contextTasks = tasks.filter(t => t.contextId === context.id);
                 div.innerHTML = `
-                    <div class="context-header">${context.name}</div>
-                    <div class="context-stats">${contextTasks.length} task(s)</div>
+                    <div class="context-label">${context.name}</div>
+                    <div class="task-area">
+                        <!-- Tasks will be positioned here -->
+                    </div>
                 `;
                 
                 // Add drag functionality
@@ -643,7 +582,7 @@ class handler(BaseHTTPRequestHandler):
                 div.className = `task-item task-${task.status}`;
                 div.style.left = task.x + 'px';
                 div.style.top = task.y + 'px';
-                div.innerHTML = task.name.length > 8 ? task.name.substring(0, 8) + '...' : task.name;
+                div.innerHTML = task.name.length > 10 ? task.name.substring(0, 10) + '...' : task.name;
                 div.dataset.id = task.id;
                 div.dataset.type = 'task';
                 
@@ -655,7 +594,9 @@ class handler(BaseHTTPRequestHandler):
 
         function startDrag(e) {
             e.preventDefault();
-            draggedElement = e.target;
+            draggedElement = e.target.closest('.context-box, .task-item');
+            if (!draggedElement) return;
+            
             draggedElement.classList.add('dragging');
             
             const rect = draggedElement.getBoundingClientRect();
@@ -684,39 +625,8 @@ class handler(BaseHTTPRequestHandler):
             x = Math.max(0, Math.min(x, canvas.offsetWidth - elementWidth));
             y = Math.max(0, Math.min(y, canvas.offsetHeight - elementHeight));
             
-            // Snap to grid if enabled
-            if (snapToGrid) {
-                const snapped = snapToGridPosition(x, y);
-                x = snapped.x;
-                y = snapped.y;
-                
-                // Show snap indicator
-                const indicator = document.getElementById('snapIndicator');
-                indicator.style.left = x + 'px';
-                indicator.style.top = y + 'px';
-                indicator.style.width = elementWidth + 'px';
-                indicator.style.height = elementHeight + 'px';
-                indicator.style.display = 'block';
-            }
-            
             draggedElement.style.left = x + 'px';
             draggedElement.style.top = y + 'px';
-            
-            // Check for collisions
-            const elementId = draggedElement.dataset.id;
-            const elementType = draggedElement.dataset.type;
-            let element = elementType === 'context' ? 
-                contexts.find(c => c.id === elementId) : 
-                tasks.find(t => t.id === elementId);
-            
-            if (element && checkCollision(element, x, y, elementWidth, elementHeight)) {
-                const warning = document.getElementById('collisionWarning');
-                warning.style.left = (x + elementWidth + 10) + 'px';
-                warning.style.top = y + 'px';
-                warning.style.display = 'block';
-            } else {
-                document.getElementById('collisionWarning').style.display = 'none';
-            }
         }
 
         function stopDrag(e) {
@@ -732,8 +642,16 @@ class handler(BaseHTTPRequestHandler):
             if (elementType === 'context') {
                 const context = contexts.find(c => c.id === elementId);
                 if (context) {
+                    const deltaX = x - context.x;
+                    const deltaY = y - context.y;
                     context.x = x;
                     context.y = y;
+                    
+                    // Move all tasks in this context
+                    tasks.filter(t => t.contextId === context.id).forEach(task => {
+                        task.x += deltaX;
+                        task.y += deltaY;
+                    });
                 }
             } else if (elementType === 'task') {
                 const task = tasks.find(t => t.id === elementId);
@@ -745,10 +663,6 @@ class handler(BaseHTTPRequestHandler):
             
             draggedElement.classList.remove('dragging');
             draggedElement = null;
-            
-            // Hide indicators
-            document.getElementById('snapIndicator').style.display = 'none';
-            document.getElementById('collisionWarning').style.display = 'none';
             
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('mouseup', stopDrag);
@@ -802,7 +716,7 @@ class handler(BaseHTTPRequestHandler):
                 tasks: tasks,
                 connections: connections,
                 timestamp: new Date().toISOString(),
-                version: "2.0-drag-drop"
+                version: "3.0-organized-layout"
             };
             
             const dataStr = JSON.stringify(workflow, null, 2);
@@ -811,111 +725,73 @@ class handler(BaseHTTPRequestHandler):
             
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'bpm_workflow_v2.json';
+            link.download = 'bpm_workflow_organized.json';
             link.click();
             
             URL.revokeObjectURL(url);
         }
 
-        // Grid and snap controls
-        document.getElementById('showGrid').addEventListener('change', function(e) {
-            showGrid = e.target.checked;
-            document.getElementById('gridOverlay').style.display = showGrid ? 'block' : 'none';
-        });
-
-        document.getElementById('snapToGrid').addEventListener('change', function(e) {
-            snapToGrid = e.target.checked;
-        });
-
-        // Initialize with sample data
+        // Initialize with sample data matching your expected layout
         function initializeSample() {
-            // Add sample contexts with proper spacing
+            // Add contexts vertically stacked
             contexts.push({
                 id: 'ctx1',
-                name: 'Data Processing',
+                name: 'Context1',
                 color: '#e6f3ff',
-                x: 60,
-                y: 60,
-                width: 220,
-                height: 160
+                x: 50,
+                y: 50,
+                width: 800,
+                height: 120
             });
             
             contexts.push({
                 id: 'ctx2',
-                name: 'Quality Control',
+                name: 'Context2',
                 color: '#fff2e6',
-                x: 320,
-                y: 60,
-                width: 220,
-                height: 160
+                x: 50,
+                y: 200,
+                width: 800,
+                height: 120
             });
             
-            contexts.push({
-                id: 'ctx3',
-                name: 'Output Generation',
-                color: '#f0fff0',
-                x: 580,
-                y: 60,
-                width: 220,
-                height: 160
-            });
-            
-            // Add sample tasks with proper positioning
+            // Add tasks horizontally within contexts
             tasks.push({
                 id: 'task1',
-                name: 'Initialize',
+                name: 'Task 1',
                 status: 'success',
                 contextId: 'ctx1',
-                x: 80,
-                y: 120
+                x: 230,
+                y: 90
             });
             
             tasks.push({
                 id: 'task2',
-                name: 'Process Data',
-                status: 'default',
+                name: 'Task 2',
+                status: 'success',
                 contextId: 'ctx1',
-                x: 180,
-                y: 120
+                x: 370,
+                y: 90
             });
             
             tasks.push({
                 id: 'task3',
-                name: 'Validate',
+                name: 'Task 1',
                 status: 'success',
-                contextId: 'ctx1',
-                x: 80,
-                y: 170
+                contextId: 'ctx2',
+                x: 230,
+                y: 240
             });
             
             tasks.push({
                 id: 'task4',
-                name: 'Quality Check',
-                status: 'delayed',
-                contextId: 'ctx2',
-                x: 340,
-                y: 120
-            });
-            
-            tasks.push({
-                id: 'task5',
-                name: 'Review',
+                name: 'Task 2',
                 status: 'default',
                 contextId: 'ctx2',
-                x: 440,
-                y: 120
+                x: 370,
+                y: 240
             });
             
-            tasks.push({
-                id: 'task6',
-                name: 'Generate Report',
-                status: 'default',
-                contextId: 'ctx3',
-                x: 600,
-                y: 120
-            });
-            
-            // Add sample connections
+            // Add connections
             connections.push({
                 id: 'conn1',
                 sourceId: 'task1',
@@ -925,16 +801,16 @@ class handler(BaseHTTPRequestHandler):
             connections.push({
                 id: 'conn2',
                 sourceId: 'task2',
-                targetId: 'task4'
+                targetId: 'task3'
             });
             
             connections.push({
                 id: 'conn3',
-                sourceId: 'task4',
-                targetId: 'task6'
+                sourceId: 'task3',
+                targetId: 'task4'
             });
             
-            nextId = 20; // Start IDs after sample data
+            nextId = 20;
             
             renderCanvas();
             updateDropdowns();
@@ -957,5 +833,5 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         
-        response = {"status": "success", "message": "BPM Tool with Drag & Drop is working!"}
+        response = {"status": "success", "message": "BPM Tool with Organized Layout is working!"}
         self.wfile.write(json.dumps(response).encode())
