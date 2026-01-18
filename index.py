@@ -41,7 +41,7 @@ class handler(BaseHTTPRequestHandler):
         }
         .controls {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 300px 1fr 250px;
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -98,11 +98,105 @@ class handler(BaseHTTPRequestHandler):
         .danger-btn:hover {
             background: #d32f2f;
         }
-        .auto-arrange-btn {
-            background: #9C27B0;
+        .style-panel {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            height: fit-content;
+            border: 2px solid #ddd;
         }
-        .auto-arrange-btn:hover {
-            background: #7B1FA2;
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid #333;
+            transition: all 0.2s;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .color-option.selected {
+            border: 3px solid #4CAF50;
+            transform: scale(1.15);
+        }
+        .style-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .style-section h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .stroke-width-options {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stroke-option {
+            width: 40px;
+            height: 20px;
+            background: #333;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        .stroke-option:hover {
+            background: #4CAF50;
+        }
+        .stroke-option.selected {
+            background: #4CAF50;
+            transform: scale(1.1);
+        }
+        .stroke-1 { height: 2px; }
+        .stroke-2 { height: 4px; }
+        .stroke-3 { height: 6px; }
+        .pattern-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .pattern-option {
+            width: 40px;
+            height: 30px;
+            border: 2px solid #333;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .pattern-option:hover {
+            border-color: #4CAF50;
+        }
+        .pattern-option.selected {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+        .selected-element-info {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+        .spacing-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .spacing-slider {
+            flex: 1;
         }
         #canvas {
             width: 100%;
@@ -182,8 +276,11 @@ class handler(BaseHTTPRequestHandler):
             box-shadow: 0 3px 6px rgba(0,0,0,0.15);
             transition: all 0.2s;
             z-index: 20;
-            min-width: 80px;
             position: relative;
+            display: inline-block;
+            white-space: nowrap;
+            min-width: auto;
+            width: auto;
         }
         .task-item:hover {
             box-shadow: 0 5px 10px rgba(0,0,0,0.25);
@@ -335,6 +432,63 @@ class handler(BaseHTTPRequestHandler):
                 <h3 style="color: #333; margin: 0 0 10px 0;">🎨 Workflow Canvas - Organized Layout</h3>
                 <div id="canvas"></div>
             </div>
+
+            <div class="style-panel">
+                <h3 style="margin-top: 0;">🎨 Style Panel</h3>
+                
+                <div id="selectedElementInfo" class="selected-element-info" style="display: none;">
+                    <strong>Selected:</strong> <span id="selectedElementName">None</span><br>
+                    <small>Click on a context or task to customize its appearance</small>
+                </div>
+
+                <div class="style-section">
+                    <h4>🎯 Stroke Colors</h4>
+                    <div class="color-grid" id="strokeColors">
+                        <div class="color-option" style="background: #000000" data-color="#000000"></div>
+                        <div class="color-option" style="background: #dc3545" data-color="#dc3545"></div>
+                        <div class="color-option" style="background: #28a745" data-color="#28a745"></div>
+                        <div class="color-option" style="background: #007bff" data-color="#007bff"></div>
+                        <div class="color-option" style="background: #ffc107" data-color="#ffc107"></div>
+                        <div class="color-option" style="background: #6f42c1" data-color="#6f42c1"></div>
+                    </div>
+                </div>
+
+                <div class="style-section">
+                    <h4>🎨 Background Colors</h4>
+                    <div class="color-grid" id="backgroundColors">
+                        <div class="color-option" style="background: #ffffff" data-color="#ffffff"></div>
+                        <div class="color-option" style="background: #f8d7da" data-color="#f8d7da"></div>
+                        <div class="color-option" style="background: #d4edda" data-color="#d4edda"></div>
+                        <div class="color-option" style="background: #cce5ff" data-color="#cce5ff"></div>
+                        <div class="color-option" style="background: #fff3cd" data-color="#fff3cd"></div>
+                        <div class="color-option" style="background: #e2e3e5" data-color="#e2e3e5"></div>
+                    </div>
+                </div>
+
+                <div class="style-section">
+                    <h4>📏 Stroke Width</h4>
+                    <div class="stroke-width-options">
+                        <div class="stroke-option stroke-1" data-width="2"></div>
+                        <div class="stroke-option stroke-2" data-width="4"></div>
+                        <div class="stroke-option stroke-3" data-width="6"></div>
+                    </div>
+                </div>
+
+                <div class="style-section">
+                    <h4>📐 Task Spacing</h4>
+                    <div class="spacing-control">
+                        <label>Gap:</label>
+                        <input type="range" id="taskSpacing" class="spacing-slider" min="10" max="50" value="20">
+                        <span id="spacingValue">20px</span>
+                    </div>
+                </div>
+
+                <div class="style-section">
+                    <h4>🔧 Quick Actions</h4>
+                    <button onclick="applyStyleToSelected()" class="secondary-btn" style="width: 100%; margin-bottom: 10px;">Apply Style</button>
+                    <button onclick="resetStyles()" style="width: 100%; background: #6c757d;">Reset Styles</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -345,6 +499,12 @@ class handler(BaseHTTPRequestHandler):
         let nextId = 1;
         let draggedElement = null;
         let dragOffset = { x: 0, y: 0 };
+        let selectedElement = null;
+        let selectedElementType = null;
+        let taskSpacing = 20;
+        let currentStrokeColor = '#333333';
+        let currentBackgroundColor = '#ffffff';
+        let currentStrokeWidth = 2;
 
         function generateId() {
             return 'item_' + (nextId++);
@@ -559,7 +719,9 @@ class handler(BaseHTTPRequestHandler):
                 div.style.top = context.y + 'px';
                 div.style.width = context.width + 'px';
                 div.style.height = context.height + 'px';
-                div.style.backgroundColor = context.color;
+                div.style.backgroundColor = context.color || '#e6f3ff';
+                div.style.borderColor = context.strokeColor || '#333333';
+                div.style.borderWidth = (context.strokeWidth || 2) + 'px';
                 div.dataset.id = context.id;
                 div.dataset.type = 'context';
                 
@@ -571,8 +733,12 @@ class handler(BaseHTTPRequestHandler):
                     </div>
                 `;
                 
-                // Add drag functionality
+                // Add drag and click functionality
                 div.addEventListener('mousedown', startDrag);
+                div.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectElement(context.id, 'context');
+                });
                 canvas.appendChild(div);
             });
 
@@ -582,13 +748,158 @@ class handler(BaseHTTPRequestHandler):
                 div.className = `task-item task-${task.status}`;
                 div.style.left = task.x + 'px';
                 div.style.top = task.y + 'px';
-                div.innerHTML = task.name.length > 10 ? task.name.substring(0, 10) + '...' : task.name;
+                div.style.backgroundColor = task.color || getDefaultTaskColor(task.status);
+                div.style.borderColor = task.strokeColor || '#333333';
+                div.style.borderWidth = (task.strokeWidth || 2) + 'px';
+                div.innerHTML = task.name;
                 div.dataset.id = task.id;
                 div.dataset.type = 'task';
                 
-                // Add drag functionality
+                // Add drag and click functionality
                 div.addEventListener('mousedown', startDrag);
+                div.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectElement(task.id, 'task');
+                });
                 canvas.appendChild(div);
+            });
+
+            // After rendering, adjust task positions based on actual widths
+            setTimeout(() => {
+                adjustTaskSpacing();
+            }, 10);
+
+            // Add canvas click handler to deselect elements
+            canvas.addEventListener('click', function(e) {
+                if (e.target === canvas) {
+                    selectedElement = null;
+                    selectedElementType = null;
+                    document.getElementById('selectedElementInfo').style.display = 'none';
+                    document.querySelectorAll('.context-box, .task-item').forEach(el => {
+                        el.style.outline = 'none';
+                    });
+                }
+            });
+        }
+
+        function getDefaultTaskColor(status) {
+            const colorMap = {
+                'success': '#28a745',
+                'failure': '#dc3545',
+                'delayed': '#fd7e14',
+                'skipped': '#6c757d',
+                'default': '#ffffff'
+            };
+            return colorMap[status] || '#ffffff';
+        }
+
+        function adjustTaskSpacing() {
+            contexts.forEach(context => {
+                const contextTasks = tasks.filter(t => t.contextId === context.id);
+                if (contextTasks.length <= 1) return;
+                
+                // Sort tasks by current x position
+                contextTasks.sort((a, b) => a.x - b.x);
+                
+                let currentX = context.x + 180; // Start position after context label
+                
+                contextTasks.forEach((task, index) => {
+                    const taskElement = document.querySelector(`[data-id="${task.id}"]`);
+                    if (taskElement) {
+                        task.x = currentX;
+                        taskElement.style.left = task.x + 'px';
+                        
+                        // Get actual rendered width and add custom spacing
+                        const actualWidth = taskElement.offsetWidth;
+                        currentX += actualWidth + taskSpacing; // Use custom spacing
+                    }
+                });
+            });
+            
+            // Re-render connections after position adjustment
+            renderConnections();
+        }
+
+        function renderConnections() {
+            // Remove existing connections
+            const existingConnections = document.querySelectorAll('.connection-line, .connection-arrow');
+            existingConnections.forEach(el => el.remove());
+            
+            // Re-render connections with updated positions
+            connections.forEach(connection => {
+                const sourceTask = tasks.find(t => t.id === connection.sourceId);
+                const targetTask = tasks.find(t => t.id === connection.targetId);
+                
+                if (sourceTask && targetTask) {
+                    const canvas = document.getElementById('canvas');
+                    const sourceContext = contexts.find(c => c.id === sourceTask.contextId);
+                    const targetContext = contexts.find(c => c.id === targetTask.contextId);
+                    const isInterContext = sourceContext.id !== targetContext.id;
+                    
+                    const sourceElement = document.querySelector(`[data-id="${sourceTask.id}"]`);
+                    const targetElement = document.querySelector(`[data-id="${targetTask.id}"]`);
+                    
+                    if (sourceElement && targetElement) {
+                        const startX = sourceTask.x + (sourceElement.offsetWidth / 2);
+                        const startY = sourceTask.y + 20;
+                        const endX = targetTask.x;
+                        const endY = targetTask.y + 20;
+                        
+                        if (isInterContext) {
+                            // Inter-context connection with L-shape
+                            const midY = sourceContext.y + sourceContext.height + 20;
+                            
+                            // Vertical line down
+                            const verticalLine = document.createElement('div');
+                            verticalLine.className = 'connection-line inter-context-connection';
+                            verticalLine.style.left = startX + 'px';
+                            verticalLine.style.top = startY + 'px';
+                            verticalLine.style.width = '4px';
+                            verticalLine.style.height = (midY - startY) + 'px';
+                            canvas.appendChild(verticalLine);
+                            
+                            // Horizontal line
+                            const horizontalLine = document.createElement('div');
+                            horizontalLine.className = 'connection-line inter-context-connection';
+                            horizontalLine.style.left = Math.min(startX, endX) + 'px';
+                            horizontalLine.style.top = midY + 'px';
+                            horizontalLine.style.width = Math.abs(endX - startX) + 'px';
+                            horizontalLine.style.height = '4px';
+                            canvas.appendChild(horizontalLine);
+                            
+                            // Vertical line up
+                            const verticalLine2 = document.createElement('div');
+                            verticalLine2.className = 'connection-line inter-context-connection';
+                            verticalLine2.style.left = endX + 'px';
+                            verticalLine2.style.top = midY + 'px';
+                            verticalLine2.style.width = '4px';
+                            verticalLine2.style.height = (endY - midY) + 'px';
+                            canvas.appendChild(verticalLine2);
+                            
+                            // Arrow
+                            const arrow = document.createElement('div');
+                            arrow.className = 'connection-arrow inter-context-arrow';
+                            arrow.style.left = (endX - 12) + 'px';
+                            arrow.style.top = (endY - 6) + 'px';
+                            canvas.appendChild(arrow);
+                        } else {
+                            // Direct horizontal connection
+                            const line = document.createElement('div');
+                            line.className = 'connection-line';
+                            line.style.left = startX + 'px';
+                            line.style.top = (startY - 2) + 'px';
+                            line.style.width = Math.abs(endX - startX) + 'px';
+                            canvas.appendChild(line);
+                            
+                            // Arrow
+                            const arrow = document.createElement('div');
+                            arrow.className = 'connection-arrow';
+                            arrow.style.left = (endX - 12) + 'px';
+                            arrow.style.top = (endY - 6) + 'px';
+                            canvas.appendChild(arrow);
+                        }
+                    }
+                }
             });
         }
 
@@ -820,7 +1131,125 @@ class handler(BaseHTTPRequestHandler):
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             initializeSample();
+            initializeStylePanel();
         });
+
+        function initializeStylePanel() {
+            // Stroke color selection
+            document.querySelectorAll('#strokeColors .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#strokeColors .color-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentStrokeColor = this.dataset.color;
+                    if (selectedElement) {
+                        applyStyleToSelected();
+                    }
+                });
+            });
+
+            // Background color selection
+            document.querySelectorAll('#backgroundColors .color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('#backgroundColors .color-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentBackgroundColor = this.dataset.color;
+                    if (selectedElement) {
+                        applyStyleToSelected();
+                    }
+                });
+            });
+
+            // Stroke width selection
+            document.querySelectorAll('.stroke-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.stroke-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentStrokeWidth = parseInt(this.dataset.width);
+                    if (selectedElement) {
+                        applyStyleToSelected();
+                    }
+                });
+            });
+
+            // Task spacing control
+            document.getElementById('taskSpacing').addEventListener('input', function() {
+                taskSpacing = parseInt(this.value);
+                document.getElementById('spacingValue').textContent = taskSpacing + 'px';
+                adjustTaskSpacing();
+            });
+
+            // Set default selections
+            document.querySelector('#strokeColors .color-option[data-color="#000000"]').classList.add('selected');
+            document.querySelector('#backgroundColors .color-option[data-color="#ffffff"]').classList.add('selected');
+            document.querySelector('.stroke-option[data-width="2"]').classList.add('selected');
+        }
+
+        function selectElement(elementId, elementType) {
+            selectedElement = elementId;
+            selectedElementType = elementType;
+            
+            // Update selected element info
+            const infoPanel = document.getElementById('selectedElementInfo');
+            const nameSpan = document.getElementById('selectedElementName');
+            
+            if (elementType === 'context') {
+                const context = contexts.find(c => c.id === elementId);
+                nameSpan.textContent = `Context: ${context.name}`;
+            } else if (elementType === 'task') {
+                const task = tasks.find(t => t.id === elementId);
+                nameSpan.textContent = `Task: ${task.name}`;
+            }
+            
+            infoPanel.style.display = 'block';
+            
+            // Highlight selected element
+            document.querySelectorAll('.context-box, .task-item').forEach(el => {
+                el.style.outline = 'none';
+            });
+            
+            const selectedEl = document.querySelector(`[data-id="${elementId}"]`);
+            if (selectedEl) {
+                selectedEl.style.outline = '3px solid #4CAF50';
+            }
+        }
+
+        function applyStyleToSelected() {
+            if (!selectedElement || !selectedElementType) return;
+            
+            if (selectedElementType === 'context') {
+                const context = contexts.find(c => c.id === selectedElement);
+                if (context) {
+                    context.color = currentBackgroundColor;
+                    context.strokeColor = currentStrokeColor;
+                    context.strokeWidth = currentStrokeWidth;
+                }
+            } else if (selectedElementType === 'task') {
+                const task = tasks.find(t => t.id === selectedElement);
+                if (task) {
+                    task.color = currentBackgroundColor;
+                    task.strokeColor = currentStrokeColor;
+                    task.strokeWidth = currentStrokeWidth;
+                }
+            }
+            
+            renderCanvas();
+        }
+
+        function resetStyles() {
+            contexts.forEach(context => {
+                context.color = '#e6f3ff';
+                context.strokeColor = '#333333';
+                context.strokeWidth = 2;
+            });
+            
+            tasks.forEach(task => {
+                task.color = '#ffffff';
+                task.strokeColor = '#333333';
+                task.strokeWidth = 2;
+            });
+            
+            renderCanvas();
+        }
     </script>
 </body>
 </html>
