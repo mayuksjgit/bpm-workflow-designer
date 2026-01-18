@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM Tool - Live Deployment Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .step:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .step-number {
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .step-content {
+            flex: 1;
+        }
+        .button {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        .button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .vercel-button {
+            background: #000;
+        }
+        .vercel-button:hover {
+            background: #333;
+        }
+        .url-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            border: 2px dashed #4CAF50;
+            text-align: center;
+            font-size: 16px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.5s ease;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .live-url {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            animation: glow 2s infinite;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); }
+        }
+        .checklist {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 3px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .checkbox.checked {
+            background: #4CAF50;
+        }
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 BPM Workflow Designer - Live Deployment</h1>
+            <p>Deploy your Business Process Management tool to Vercel and get a public URL</p>
+        </div>
+
+        <div class="status-card">
+            <h2>📋 Repository Status</h2>
+            <p><strong>GitHub Account:</strong> mayuk.sj@gmail.com</p>
+            <p><strong>Repository:</strong> https://github.com/mayuksjgit/bpm-workflow-designer</p>
+            <p><strong>Status:</strong> ✅ Ready for deployment</p>
+            <p><strong>Files:</strong> 25+ files including Docker configs, documentation, and source code</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <h2>🎯 Deployment Steps</h2>
+
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Access Vercel</h3>
+                <p>Vercel should have opened in your browser. If not, click below:</p>
+                <a href="https://vercel.com" target="_blank" class="button vercel-button">Open Vercel.com</a>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Login with GitHub</h3>
+                <p>Click "Continue with GitHub" and use your account: <strong>mayuk.sj@gmail.com</strong></p>
+                <button class="button" onclick="updateProgress(20)">✅ Logged In</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>Import Project</h3>
+                <p>Click "New Project" → Find "bpm-workflow-designer" → Click "Import"</p>
+                <button class="button" onclick="updateProgress(40)">✅ Project Imported</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Configure Deployment</h3>
+                <p>Framework: "Other" | Build Command: Leave empty | Click "Deploy"</p>
+                <button class="button" onclick="updateProgress(60)">✅ Configuration Set</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Deploy & Get URL</h3>
+                <p>Wait 3-5 minutes for deployment to complete</p>
+                <button class="button" onclick="updateProgress(100); showLiveURL()">✅ Deployment Complete</button>
+            </div>
+        </div>
+
+        <div id="liveURLSection" style="display: none;">
+            <div class="live-url">
+                <h2>🎉 Your BPM Tool is Live!</h2>
+                <div class="url-display">
+                    <strong>Public URL:</strong><br>
+                    <span id="deploymentURL">https://bpm-workflow-designer-xxx.vercel.app</span>
+                </div>
+                <a href="#" id="accessButton" target="_blank" class="button" style="font-size: 16px; padding: 15px 30px;">
+                    🌍 Access Your BPM Tool
+                </a>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <h3>🎯 Post-Deployment Checklist</h3>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Access the public URL</span>
+            </div>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Create a context box</span>
+            </div>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Add tasks to the context</span>
+            </div>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Connect tasks with arrows</span>
+            </div>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Test zoom controls</span>
+            </div>
+            <div class="checklist-item">
+                <div class="checkbox" onclick="toggleCheck(this)"></div>
+                <span>Save and load a workflow</span>
+            </div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature">
+                <h3>🎨 Visual Designer</h3>
+                <p>Drag-and-drop workflow creation</p>
+            </div>
+            <div class="feature">
+                <h3>📦 Context Boxes</h3>
+                <p>Organize related processes</p>
+            </div>
+            <div class="feature">
+                <h3>🔗 Task Connections</h3>
+                <p>Multiple predecessors/successors</p>
+            </div>
+            <div class="feature">
+                <h3>💾 Save/Load</h3>
+                <p>Persistent workflow storage</p>
+            </div>
+            <div class="feature">
+                <h3>📱 Responsive</h3>
+                <p>Works on all devices</p>
+            </div>
+            <div class="feature">
+                <h3>🌍 Global Access</h3>
+                <p>Fast worldwide delivery</p>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <h3>🔗 Quick Links</h3>
+            <a href="https://vercel.com" target="_blank" class="button vercel-button">Vercel Dashboard</a>
+            <a href="https://github.com/mayuksjgit/bpm-workflow-designer" target="_blank" class="button">GitHub Repository</a>
+        </div>
+    </div>
+
+    <script>
+        let currentProgress = 0;
+
+        function updateProgress(percentage) {
+            currentProgress = percentage;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            
+            if (percentage === 100) {
+                setTimeout(() => {
+                    showLiveURL();
+                }, 1000);
+            }
+        }
+
+        function showLiveURL() {
+            document.getElementById('liveURLSection').style.display = 'block';
+            document.getElementById('liveURLSection').scrollIntoView({ behavior: 'smooth' });
+            
+            // Simulate getting the actual URL (in real deployment, this would be the actual Vercel URL)
+            const urlElement = document.getElementById('deploymentURL');
+            const accessButton = document.getElementById('accessButton');
+            
+            // You would replace this with the actual URL from Vercel
+            const actualURL = 'https://bpm-workflow-designer.vercel.app';
+            urlElement.textContent = actualURL;
+            accessButton.href = actualURL;
+        }
+
+        function toggleCheck(checkbox) {
+            checkbox.classList.toggle('checked');
+        }
+
+        // Auto-start progress animation
+        setTimeout(() => {
+            updateProgress(10);
+        }, 1000);
+    </script>
+</body>
+</html>
